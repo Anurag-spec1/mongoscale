@@ -75,10 +75,10 @@ export default function DashboardPage() {
       <RequestStream history={history} />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <LatencyChart data={history} stressed={stressed} />
-        <ThroughputChart data={history} stressed={stressed} />
-        <UsersErrorsChart data={history} stressed={stressed} />
-        <MongoOpsChart data={history} stressed={stressed} />
+        <LatencyChart data={history} />
+        <ThroughputChart data={history} />
+        <UsersErrorsChart data={history} />
+        <MongoOpsChart data={history} />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1fr_1fr_1fr]">

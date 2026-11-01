@@ -20,9 +20,11 @@ const presets: Preset[] = [
 
 interface Props {
   status: LoadTestStatus | null;
+  loading: boolean;
+  statusError: string | null;
 }
 
-export function LoadTestPanel({ status }: Props) {
+export function LoadTestPanel({ status, loading, statusError }: Props) {
   const [selected, setSelected] = useState(0);
   const [custom, setCustom] = useState<LoadTestRequest>({ users: 2000, rampUpSeconds: 30, holdSeconds: 60, rampDownSeconds: 15, ...think });
   const [useCustom, setUseCustom] = useState(false);
@@ -62,7 +64,7 @@ export function LoadTestPanel({ status }: Props) {
       <div className="flex items-center justify-between">
         <span className="panel-title">Live load test</span>
         <StatusPill tone={running ? 'info' : 'neutral'}>
-          {status?.phase ?? 'idle'}
+          {status?.phase ?? (loading ? 'Loading' : 'Unavailable')}
         </StatusPill>
       </div>
 
@@ -115,23 +117,25 @@ export function LoadTestPanel({ status }: Props) {
         </div>
       ) : null}
 
-      <div className="mt-5 space-y-4">
+      {status ? <div className="mt-5 space-y-4">
         <ProgressMeter
-          value={status?.progressPercent ?? 0}
+          value={status.progressPercent}
           max={100}
           label="Test progress"
-          valueLabel={status ? `${Math.round(status.progressPercent)}% · ${formatDuration(status.elapsedSeconds)} / ${formatDuration(status.totalSeconds)}` : 'Unavailable'}
+          valueLabel={`${Math.round(status.progressPercent)}% | ${formatDuration(status.elapsedSeconds)} / ${formatDuration(status.totalSeconds)}`}
           tone={running ? 'info' : 'neutral'}
         />
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <Readout label="Virtual users" value={formatNumber(status?.activeUsers ?? 0)} />
-          <Readout label="Peak users" value={formatNumber(status?.peakUsers ?? 0)} />
-          <Readout label="Requests" value={formatNumber(status?.requests ?? 0)} />
-          <Readout label="Failed" value={formatNumber(status?.failures ?? 0)} danger={(status?.failures ?? 0) > 0} />
-          <Readout label="Throttled" value={formatNumber(status?.throttled ?? 0)} />
+          <Readout label="Virtual users" value={formatNumber(status.activeUsers)} />
+          <Readout label="Peak users" value={formatNumber(status.peakUsers)} />
+          <Readout label="Requests" value={formatNumber(status.requests)} />
+          <Readout label="Failed" value={formatNumber(status.failures)} danger={status.failures > 0} />
+          <Readout label="Throttled" value={formatNumber(status.throttled)} />
           <Readout label="Failure rate" value={`${failureRate.toFixed(1)}%`} danger={failureRate >= 5} />
         </div>
-      </div>
+      </div> : <div role={statusError ? 'alert' : 'status'} className="mt-5 border-t border-line pt-4 text-sm text-slate-400">{statusError ? 'Load test status is unavailable.' : loading ? 'Loading load test status…' : 'No load test status reported.'}</div>}
+
+      {statusError ? <div role="alert" className="mt-3 text-xs text-danger">{statusError}</div> : null}
 
       {error ? (
         <div role="alert" className="mt-4 border-l-2 border-danger bg-status-danger/10 px-3 py-2 text-sm text-danger">
@@ -174,7 +178,7 @@ function NumberField({ label, value, max, onChange, disabled }: { label: string;
 function Readout({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-widest text-slate-500">{label}</div>
+      <div className="text-xs text-slate-400">{label}</div>
       <div className={classNames('font-semibold tabular-nums', danger ? 'text-danger' : 'text-slate-100')}>{value}</div>
     </div>
   );

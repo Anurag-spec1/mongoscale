@@ -43,7 +43,7 @@ export function AnimatedCounter({ value, format = formatNumber, className }: Cou
   const text = useTransform(motionValue, (latest) => format(latest));
 
   useEffect(() => {
-    const controls = animate(motionValue, value, { duration: 0.6, ease: 'easeOut' });
+    const controls = animate(motionValue, value, { duration: 0.18, ease: 'easeOut' });
     return () => controls.stop();
   }, [motionValue, value]);
 
@@ -105,7 +105,7 @@ export function StatusPill({ tone, children }: { tone: Tone; children: ReactNode
 
 interface MetricCardProps {
   label: string;
-  value: number;
+  value: number | null;
   format?: (value: number) => string;
   unit?: string;
   hint?: string;
@@ -117,7 +117,7 @@ export function MetricCard({ label, value, format, unit, hint, tone = 'neutral' 
     <div className={classNames('panel border-t-2 p-4', toneBorder[tone])}>
       <div className="text-xs font-medium text-slate-400">{label}</div>
       <div className="mt-2 flex items-baseline gap-1.5">
-        <AnimatedCounter value={value} format={format} className={classNames('text-3xl font-bold tabular-nums', toneText[tone])} />
+        {value === null ? <span className="text-3xl font-bold text-slate-500">--</span> : <AnimatedCounter value={value} format={format} className={classNames('text-3xl font-bold tabular-nums', toneText[tone])} />}
         {unit ? <span className="text-sm text-slate-500">{unit}</span> : null}
       </div>
       {hint ? <div className="mt-1 text-xs text-slate-500">{hint}</div> : null}

@@ -6,10 +6,12 @@ const order: OptimizationMode[] = ['unoptimized', 'indexed', 'replica-set', 'sha
 
 interface Props {
   catalog: OptimizationCatalog | null;
+  loading: boolean;
+  loadError: string | null;
   onChanged: () => void;
 }
 
-export function ModeSwitcher({ catalog, onChanged }: Props) {
+export function ModeSwitcher({ catalog, loading, loadError, onChanged }: Props) {
   const [pending, setPending] = useState<OptimizationMode | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -43,13 +45,14 @@ export function ModeSwitcher({ catalog, onChanged }: Props) {
           disabled={pending !== null || modes.length === 0}
           onChange={(event) => void apply(event.target.value as OptimizationMode)}
         >
-          {!current ? <option value="">Loading modes…</option> : null}
+          {!current ? <option value="">{loadError ? 'Unavailable' : loading ? 'Loading modes…' : 'No modes available'}</option> : null}
           {modes.map((tuning) => <option key={tuning.mode} value={tuning.mode}>{tuning.label}</option>)}
         </select>
       </label>
       <p className="mt-3 min-h-10 text-xs leading-relaxed text-slate-400">
         {pending ? `Switching to ${modes.find((entry) => entry.mode === pending)?.label ?? 'selected mode'}…` : selectedMode?.description ?? 'Optimization modes are unavailable.'}
       </p>
+      {loadError ? <div role="alert" className="mt-3 text-xs text-danger">{catalog ? 'Refresh failed; showing the last received mode.' : 'Optimization modes are unavailable.'}</div> : null}
       {warnings.length > 0 ? (
         <div role="status" className="mt-3 space-y-1 border-l-2 border-warn bg-status-warn/10 px-3 py-2 text-xs text-warn">
           {warnings.map((warning) => (

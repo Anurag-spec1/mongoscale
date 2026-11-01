@@ -24,20 +24,21 @@ function clock(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString('en-GB');
 }
 
-interface ChartProps { data: MetricPoint[] }
+interface ChartProps { data: MetricPoint[]; error: string | null }
 
-function Frame({ title, data, children }: { title: string; data: MetricPoint[]; children: ReactNode }) {
+function Frame({ title, data, error, children }: { title: string; data: MetricPoint[]; error: string | null; children: ReactNode }) {
   return (
     <div className="panel p-4">
       <div className="panel-title mb-3">{title}</div>
-      {data.length > 0 ? <div className="h-56">{children}</div> : <div className="flex h-56 items-center justify-center text-sm text-slate-500">Waiting for live metrics.</div>}
+      {error ? <div role="alert" className="mb-2 text-xs text-warn">Refresh failed; showing the last received metrics.</div> : null}
+      {data.length > 0 ? <div className="h-56">{children}</div> : <div role={error ? 'alert' : 'status'} className="flex h-56 items-center justify-center text-sm text-slate-400">{error ? 'Chart data is unavailable.' : 'Waiting for live metrics.'}</div>}
     </div>
   );
 }
 
-export function LatencyChart({ data }: ChartProps) {
+export function LatencyChart({ data, error }: ChartProps) {
   return (
-    <Frame title="Latency (ms)" data={data}>
+    <Frame title="Latency (ms)" data={data} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />
@@ -54,9 +55,9 @@ export function LatencyChart({ data }: ChartProps) {
   );
 }
 
-export function ThroughputChart({ data }: ChartProps) {
+export function ThroughputChart({ data, error }: ChartProps) {
   return (
-    <Frame title="Throughput (requests / second)" data={data}>
+    <Frame title="Throughput (requests / second)" data={data} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />
@@ -70,9 +71,9 @@ export function ThroughputChart({ data }: ChartProps) {
   );
 }
 
-export function UsersErrorsChart({ data }: ChartProps) {
+export function UsersErrorsChart({ data, error }: ChartProps) {
   return (
-    <Frame title="Virtual users and failed requests" data={data}>
+    <Frame title="Virtual users and failed requests" data={data} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />
@@ -89,9 +90,9 @@ export function UsersErrorsChart({ data }: ChartProps) {
   );
 }
 
-export function MongoOpsChart({ data }: ChartProps) {
+export function MongoOpsChart({ data, error }: ChartProps) {
   return (
-    <Frame title="MongoDB read / write throughput (ops / second)" data={data}>
+    <Frame title="MongoDB read / write throughput (ops / second)" data={data} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />

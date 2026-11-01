@@ -50,44 +50,39 @@ export function AnimatedCounter({ value, format = formatNumber, className }: Cou
   return <motion.span className={className}>{text}</motion.span>;
 }
 
-interface RingProps {
+interface MeterProps {
   value: number;
   max: number;
   label: string;
-  caption?: string;
+  valueLabel: string;
   tone?: Tone;
-  size?: number;
 }
 
-export function ProgressRing({ value, max, label, caption, tone = 'good', size = 104 }: RingProps) {
-  const radius = size / 2 - 9;
-  const circumference = 2 * Math.PI * radius;
+export function ProgressMeter({ value, max, label, valueLabel, tone = 'good' }: MeterProps) {
   const fraction = max > 0 ? Math.min(Math.max(value / max, 0), 1) : 0;
+  const meterColor: Record<Tone, string> = {
+    neutral: 'bg-slate-500',
+    good: 'bg-status-good',
+    warn: 'bg-status-warn',
+    bad: 'bg-status-danger',
+    info: 'bg-brand',
+  };
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="-rotate-90">
-          <circle cx={size / 2} cy={size / 2} r={radius} stroke="#1c2740" strokeWidth={8} fill="none" />
-          <motion.circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={toneStroke[tone]}
-            strokeWidth={8}
-            strokeLinecap="round"
-            fill="none"
-            strokeDasharray={circumference}
-            initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset: circumference * (1 - fraction) }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={classNames('text-lg font-bold tabular-nums', toneText[tone])}>{Math.round(fraction * 100)}%</span>
-          {caption ? <span className="text-[10px] text-slate-500">{caption}</span> : null}
-        </div>
+    <div className="min-w-0 space-y-2">
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="truncate text-xs text-slate-400">{label}</span>
+        <span className="shrink-0 font-mono text-xs text-slate-200">{valueLabel}</span>
       </div>
-      <span className="text-xs font-medium text-slate-400">{label}</span>
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-valuenow={Math.min(Math.max(value, 0), max)}
+        className="h-1.5 overflow-hidden rounded-sm bg-ink-700"
+      >
+        <div className={classNames('h-full transition-[width] duration-200', meterColor[tone])} style={{ width: `${fraction * 100}%` }} />
+      </div>
     </div>
   );
 }

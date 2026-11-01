@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { api, ApiError } from '../services/api';
 import type { LoadTestRequest, LoadTestStatus } from '../types';
 import { classNames, formatDuration, formatNumber } from '../utils/format';
-import { ProgressRing, StatusPill } from './primitives';
+import { ProgressMeter, StatusPill } from './primitives';
 
 interface Preset {
   label: string;
@@ -113,14 +113,15 @@ export function LoadTestPanel({ status }: Props) {
         </div>
       ) : null}
 
-      <div className="mt-5 flex items-center gap-5">
-        <ProgressRing
+      <div className="mt-5 space-y-4">
+        <ProgressMeter
           value={status?.progressPercent ?? 0}
           max={100}
-          label={status ? formatDuration(status.elapsedSeconds) + ' / ' + formatDuration(status.totalSeconds) : '0:00 / 0:00'}
+          label="Test progress"
+          valueLabel={status ? `${Math.round(status.progressPercent)}% · ${formatDuration(status.elapsedSeconds)} / ${formatDuration(status.totalSeconds)}` : 'Unavailable'}
           tone={running ? 'info' : 'neutral'}
         />
-        <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-2 text-sm">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <Readout label="Virtual users" value={formatNumber(status?.activeUsers ?? 0)} />
           <Readout label="Peak users" value={formatNumber(status?.peakUsers ?? 0)} />
           <Readout label="Requests" value={formatNumber(status?.requests ?? 0)} />

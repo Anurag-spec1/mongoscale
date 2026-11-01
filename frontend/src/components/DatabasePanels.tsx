@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import type { MetricsResponse, MongoStatus, QueryPlan } from '../types';
 import { classNames, formatMillis, formatNumber } from '../utils/format';
-import { ProgressRing, StatusPill, type Tone } from './primitives';
+import { ProgressMeter, StatusPill, type Tone } from './primitives';
 
 export function QueryPlanTable({ plans }: { plans: QueryPlan[] }) {
   return (
@@ -108,17 +108,17 @@ export function HealthGauges({ metrics, mongo }: { metrics: MetricsResponse | nu
   return (
     <div className="panel p-5">
       <span className="panel-title">Database health</span>
-      <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <ProgressRing value={poolPercent} max={100} label="Pool in use" caption={pool ? `${pool.inUse}/${pool.max}` : undefined} tone={poolTone(poolPercent)} />
-        <ProgressRing value={current?.cpuPercent ?? 0} max={100} label="API CPU" tone={cpuTone(current?.cpuPercent ?? 0)} />
-        <ProgressRing
+      <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-4 xl:grid-cols-4">
+        <ProgressMeter value={pool?.inUse ?? 0} max={pool?.max ?? 0} label="Pool in use" valueLabel={pool ? `${pool.inUse} / ${pool.max}` : 'Unavailable'} tone={poolTone(poolPercent)} />
+        <ProgressMeter value={current?.cpuPercent ?? 0} max={100} label="API CPU" valueLabel={current ? `${current.cpuPercent.toFixed(0)}% / 100%` : 'Unavailable'} tone={cpuTone(current?.cpuPercent ?? 0)} />
+        <ProgressMeter
           value={mongo?.connections.current ?? 0}
-          max={Math.max(connectionLimit, 1)}
+          max={connectionLimit}
           label="Mongo connections"
-          caption={mongo ? String(mongo.connections.current) : undefined}
+          valueLabel={mongo ? `${mongo.connections.current} / ${connectionLimit}` : 'Unavailable'}
           tone="info"
         />
-        <ProgressRing value={cacheRate} max={100} label="Cache hit rate" caption={metrics?.cache.enabled ? undefined : 'off'} tone={metrics?.cache.enabled ? 'good' : 'neutral'} />
+        <ProgressMeter value={cacheRate} max={100} label="Cache hit rate" valueLabel={metrics ? metrics.cache.enabled ? `${cacheRate.toFixed(0)}% / 100%` : 'Off' : 'Unavailable'} tone={metrics?.cache.enabled ? 'good' : 'neutral'} />
       </div>
       <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
         <Fact label="Pool waiting" value={formatNumber(pool?.waiting ?? 0)} bad={(pool?.waiting ?? 0) > 0} />

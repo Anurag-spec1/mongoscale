@@ -17,8 +17,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['InterVariable', 'Inter', 'sans-serif'],
-        mono: ['JetBrainsMonoVariable', 'JetBrains Mono', 'monospace'],
+        sans: ['Inter Variable', 'sans-serif'],
+        mono: ['JetBrains Mono Variable', 'monospace'],
       },
       spacing: {
         1.5: '6px',

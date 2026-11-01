@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import type { MetricsResponse, MongoStatus, QueryPlan } from '../types';
 import { classNames, formatMillis, formatNumber } from '../utils/format';
 import { ProgressMeter, StatusPill, type Tone } from './primitives';
@@ -10,9 +9,9 @@ export function QueryPlanTable({ plans }: { plans: QueryPlan[] }) {
         <span className="panel-title">Query plans (explain executionStats)</span>
         <span className="text-xs text-slate-500">refreshed every 15 s</span>
       </div>
-      <div className="mt-4 overflow-x-auto">
+      <div className="mt-4 max-h-80 overflow-auto">
         <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="text-[11px] uppercase tracking-widest text-slate-500">
+          <thead className="sticky top-0 z-10 bg-ink-900 text-[11px] text-slate-400">
             <tr>
               <th className="pb-2 font-medium">Query</th>
               <th className="pb-2 font-medium">Plan</th>
@@ -25,14 +24,14 @@ export function QueryPlanTable({ plans }: { plans: QueryPlan[] }) {
             {plans.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-6 text-center text-slate-500">
-                  Waiting for the first explain run…
+                  No query plan data reported yet.
                 </td>
               </tr>
             ) : null}
             {plans.map((plan) => {
               const scan = plan.stage === 'COLLSCAN';
               return (
-                <motion.tr key={plan.name} layout className="border-t border-line">
+                <tr key={plan.name} className="border-t border-line">
                   <td className="py-2.5 pr-3">
                     <div className="font-medium text-slate-200">{plan.name}</div>
                     <div className="font-mono text-[11px] text-slate-500">{plan.collection}: {plan.filter}</div>
@@ -46,7 +45,7 @@ export function QueryPlanTable({ plans }: { plans: QueryPlan[] }) {
                   </td>
                   <td className="py-2.5 text-right tabular-nums text-slate-300">{formatNumber(plan.returned)}</td>
                   <td className="py-2.5 text-right tabular-nums text-slate-300">{plan.executionMillis} ms</td>
-                </motion.tr>
+                </tr>
               );
             })}
           </tbody>
@@ -72,11 +71,7 @@ export function IndexUsageList({ indexes }: { indexes: MongoStatus['indexes'] })
               <span className="tabular-nums text-slate-500">{formatNumber(index.accesses)}</span>
             </div>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-700">
-              <motion.div
-                className="h-full rounded-full bg-info"
-                animate={{ width: `${(index.accesses / max) * 100}%` }}
-                transition={{ duration: 0.6 }}
-              />
+              <div className="h-full bg-info transition-[width] duration-200" style={{ width: `${(index.accesses / max) * 100}%` }} />
             </div>
           </div>
         ))}
@@ -135,7 +130,7 @@ export function HealthGauges({ metrics, mongo }: { metrics: MetricsResponse | nu
 function Fact({ label, value, bad = false }: { label: string; value: string; bad?: boolean }) {
   return (
     <div>
-      <dt className="text-[11px] uppercase tracking-widest text-slate-500">{label}</dt>
+      <dt className="text-xs text-slate-400">{label}</dt>
       <dd className={classNames('font-semibold tabular-nums', bad ? 'text-danger' : 'text-slate-100')}>{value}</dd>
     </div>
   );

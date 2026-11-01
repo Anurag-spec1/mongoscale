@@ -168,7 +168,7 @@ export function ShardView({ distribution }: ShardProps) {
                   <div className="text-xs text-slate-500">documents · {formatBytes(shard.sizeBytes)}</div>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {(shard.members ?? []).map((member) => (
-                      <StatusPill key={member.name} tone={stateTone(member)} pulse={member.state === 'PRIMARY'}>
+                      <StatusPill key={member.name} tone={stateTone(member)}>
                         {member.name.split(':')[0]} · {member.state === 'PRIMARY' ? 'P' : 'S'}
                       </StatusPill>
                     ))}

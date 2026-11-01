@@ -59,10 +59,10 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
         <MetricCard label="Virtual users" value={current?.activeUsers ?? 0} format={formatNumber} tone="info" hint={`${formatNumber(current?.inflight ?? 0)} in flight`} />
-        <MetricCard label="Requests / s" value={current?.rps ?? 0} format={formatNumber} tone={stressed ? 'bad' : 'good'} hint={`${formatCompact(snapshot?.totals.requests ?? 0)} total`} shake />
-        <MetricCard label="p95 latency" value={current?.p95 ?? 0} format={formatMillis} tone={latencyTone(current?.p95 ?? 0)} hint={`p99 ${formatMillis(current?.p99 ?? 0)}`} shake />
-        <MetricCard label="Error rate" value={current?.errorRate ?? 0} format={(value) => `${value.toFixed(1)}%`} tone={errorTone(current?.errorRate ?? 0)} hint="5xx and timeouts" shake />
-        <MetricCard label="Failed requests" value={snapshot?.totals.errors ?? 0} format={formatNumber} tone={(snapshot?.totals.errors ?? 0) > 0 ? 'bad' : 'neutral'} hint={`${formatNumber(snapshot?.totals.throttled ?? 0)} throttled`} shake />
+        <MetricCard label="Requests / s" value={current?.rps ?? 0} format={formatNumber} tone={stressed ? 'bad' : 'good'} hint={`${formatCompact(snapshot?.totals.requests ?? 0)} total`} />
+        <MetricCard label="p95 latency" value={current?.p95 ?? 0} format={formatMillis} tone={latencyTone(current?.p95 ?? 0)} hint={`p99 ${formatMillis(current?.p99 ?? 0)}`} />
+        <MetricCard label="Error rate" value={current?.errorRate ?? 0} format={(value) => `${value.toFixed(1)}%`} tone={errorTone(current?.errorRate ?? 0)} hint="5xx and timeouts" />
+        <MetricCard label="Failed requests" value={snapshot?.totals.errors ?? 0} format={formatNumber} tone={(snapshot?.totals.errors ?? 0) > 0 ? 'bad' : 'neutral'} hint={`${formatNumber(snapshot?.totals.throttled ?? 0)} throttled`} />
         <MetricCard
           label="Mongo ops / s"
           value={(current?.mongoReads ?? 0) + (current?.mongoWrites ?? 0)}

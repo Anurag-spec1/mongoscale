@@ -62,7 +62,7 @@ export function LoadTestPanel({ status }: Props) {
     <div className="panel p-5">
       <div className="flex items-center justify-between">
         <span className="panel-title">Live load test</span>
-        <StatusPill tone={running ? 'info' : 'neutral'} pulse={running}>
+        <StatusPill tone={running ? 'info' : 'neutral'}>
           {status?.phase ?? 'idle'}
         </StatusPill>
       </div>

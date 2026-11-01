@@ -6,17 +6,17 @@ export type Tone = 'neutral' | 'good' | 'warn' | 'bad' | 'info';
 
 const toneText: Record<Tone, string> = {
   neutral: 'text-slate-100',
-  good: 'text-brand',
-  warn: 'text-warn',
-  bad: 'text-danger',
+  good: 'text-status-good',
+  warn: 'text-status-warn',
+  bad: 'text-status-danger',
   info: 'text-info',
 };
 
 const toneBorder: Record<Tone, string> = {
   neutral: 'border-line',
-  good: 'border-brand/40',
-  warn: 'border-warn/50',
-  bad: 'border-danger/70',
+  good: 'border-status-good/40',
+  warn: 'border-status-warn/50',
+  bad: 'border-status-danger/70',
   info: 'border-info/40',
 };
 
@@ -92,20 +92,17 @@ export function ProgressRing({ value, max, label, caption, tone = 'good', size =
   );
 }
 
-export function StatusPill({ tone, children, pulse = false }: { tone: Tone; children: ReactNode; pulse?: boolean }) {
+export function StatusPill({ tone, children }: { tone: Tone; children: ReactNode }) {
   const palette: Record<Tone, string> = {
-    neutral: 'bg-slate-700/40 text-slate-300 border-slate-600/60',
-    good: 'bg-brand/10 text-brand border-brand/40',
-    warn: 'bg-warn/10 text-warn border-warn/40',
-    bad: 'bg-danger/15 text-danger border-danger/50',
-    info: 'bg-info/10 text-info border-info/40',
+    neutral: 'bg-ink-700 text-slate-300 border-line',
+    good: 'bg-status-good/10 text-status-good border-status-good/40',
+    warn: 'bg-status-warn/10 text-status-warn border-status-warn/40',
+    bad: 'bg-status-danger/10 text-status-danger border-status-danger/40',
+    info: 'bg-accent-muted text-brand border-line',
   };
   return (
-    <span className={classNames('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold', palette[tone])}>
-      <span
-        className={classNames('h-1.5 w-1.5 rounded-full', pulse && 'animate-heartbeat')}
-        style={{ backgroundColor: toneStroke[tone] }}
-      />
+    <span className={classNames('inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 text-xs font-medium', palette[tone])}>
+      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: toneStroke[tone] }} />
       {children}
     </span>
   );
@@ -118,23 +115,17 @@ interface MetricCardProps {
   unit?: string;
   hint?: string;
   tone?: Tone;
-  shake?: boolean;
 }
 
-export function MetricCard({ label, value, format, unit, hint, tone = 'neutral', shake = false }: MetricCardProps) {
-  const shaking = shake && tone === 'bad';
+export function MetricCard({ label, value, format, unit, hint, tone = 'neutral' }: MetricCardProps) {
   return (
-    <motion.div
-      className={classNames('panel relative overflow-hidden p-4 transition-colors', toneBorder[tone], shaking && 'shadow-glowRed')}
-      animate={shaking ? { x: [0, -4, 4, -3, 3, 0] } : { x: 0 }}
-      transition={shaking ? { duration: 0.5, repeat: Infinity, repeatDelay: 1.1 } : { duration: 0.2 }}
-    >
-      <div className="panel-title">{label}</div>
+    <div className={classNames('panel border-t-2 p-4', toneBorder[tone])}>
+      <div className="text-xs font-medium text-slate-400">{label}</div>
       <div className="mt-2 flex items-baseline gap-1.5">
         <AnimatedCounter value={value} format={format} className={classNames('text-3xl font-bold tabular-nums', toneText[tone])} />
         {unit ? <span className="text-sm text-slate-500">{unit}</span> : null}
       </div>
       {hint ? <div className="mt-1 text-xs text-slate-500">{hint}</div> : null}
-    </motion.div>
+    </div>
   );
 }

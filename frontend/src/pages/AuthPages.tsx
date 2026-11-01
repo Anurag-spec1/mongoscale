@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { api, ApiError } from '../services/api';
 import { useAuthStore } from '../store/auth';
 import type { AuthResponse } from '../types';
+import { Icon } from '../components/icons';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -37,14 +38,18 @@ export function LoginPage() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto mt-10 max-w-md">
-      <form onSubmit={submit} className="panel space-y-4 p-8">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-100">Admin sign in</h1>
-          <p className="mt-1 text-sm text-slate-500">Sign in with an administrator account to open the dashboard.</p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }} className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-sm items-center">
+      <form onSubmit={submit} className="w-full space-y-5 border border-line bg-ink-900 p-6 sm:p-8">
+        <div className="mb-7">
+          <div className="mb-5 flex items-center gap-2 text-sm font-semibold text-slate-100">
+            <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-brand text-ink-950"><Icon name="database" size={17} /></span>
+            MongoScale
+          </div>
+          <h1 className="text-2xl font-semibold text-slate-100">Admin sign in</h1>
+          <p className="mt-2 text-sm text-slate-400">Sign in with an administrator account.</p>
         </div>
         <label className="block">
-          <span className="label">Email</span>
+          <span className="label">Email address</span>
           <input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" />
         </label>
         <label className="block">
@@ -59,13 +64,10 @@ export function LoginPage() {
             autoComplete="current-password"
           />
         </label>
-        {error ? <div className="rounded-xl border border-danger/50 bg-danger/10 px-3 py-2 text-sm text-danger">{error}</div> : null}
+        {error ? <div role="alert" className="border-l-2 border-danger bg-status-danger/10 px-3 py-2 text-sm text-danger">{error}</div> : null}
         <button type="submit" className="btn-primary w-full" disabled={busy}>
           {busy ? 'Please wait…' : 'Sign in'}
         </button>
-        <p className="rounded-xl border border-line bg-ink-900 px-3 py-2 text-xs text-slate-500">
-          Use the administrator credentials configured for this deployment.
-        </p>
       </form>
     </motion.div>
   );

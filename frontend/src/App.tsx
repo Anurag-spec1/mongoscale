@@ -1,5 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Layout, RequireAuth } from './components/Layout';
+import { isAdmin, useAuthStore } from './store/auth';
 import ArchitecturePage from './pages/ArchitecturePage';
 import ComparisonPage from './pages/ComparisonPage';
 import DashboardPage from './pages/DashboardPage';
@@ -9,8 +10,9 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
+        <Route index element={<HomeRedirect />} />
         <Route path="login" element={<LoginPage />} />
-        <Route element={<RequireAuth admin />}>
+        <Route element={<RequireAuth />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="architecture" element={<ArchitecturePage />} />
           <Route path="comparison" element={<ComparisonPage />} />
@@ -19,4 +21,9 @@ export default function App() {
       </Route>
     </Routes>
   );
+}
+
+function HomeRedirect() {
+  const user = useAuthStore((state) => state.user);
+  return <Navigate to={isAdmin(user) ? '/dashboard' : '/login'} replace />;
 }

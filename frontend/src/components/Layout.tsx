@@ -55,14 +55,11 @@ export function Layout() {
   );
 }
 
-export function RequireAuth({ admin = false }: { admin?: boolean }) {
+export function RequireAuth() {
   const user = useAuthStore((state) => state.user);
   const location = useLocation();
-  if (!user) {
+  if (!isAdmin(user)) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
-  }
-  if (admin && !isAdmin(user)) {
-    return <Navigate to="/" replace />;
   }
   return <Outlet />;
 }

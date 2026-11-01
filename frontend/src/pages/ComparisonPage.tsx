@@ -44,9 +44,9 @@ function LevelTable({ users, results }: { users: number; results: LoadTestResult
         <table className="w-full min-w-[720px] text-sm">
         <thead className="sticky top-0 z-10 bg-ink-900">
           <tr className="text-left text-[11px] text-slate-400">
-            <th className="pb-3 font-medium">Metric</th>
+            <th scope="col" className="pb-3 font-medium">Metric</th>
             {columns.map((column) => (
-              <th key={column.mode} className="pb-3 text-right font-medium">
+              <th key={column.mode} scope="col" className="pb-3 text-right font-medium">
                 {column.label}
               </th>
             ))}

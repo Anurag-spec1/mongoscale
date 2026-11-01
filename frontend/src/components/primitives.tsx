@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
-import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 import { classNames, formatNumber } from '../utils/format';
 
 export type Tone = 'neutral' | 'good' | 'warn' | 'bad' | 'info';
@@ -41,11 +41,16 @@ interface CounterProps {
 export function AnimatedCounter({ value, format = formatNumber, className }: CounterProps) {
   const motionValue = useMotionValue(value);
   const text = useTransform(motionValue, (latest) => format(latest));
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
+    if (reduceMotion) {
+      motionValue.set(value);
+      return undefined;
+    }
     const controls = animate(motionValue, value, { duration: 0.18, ease: 'easeOut' });
     return () => controls.stop();
-  }, [motionValue, value]);
+  }, [motionValue, value, reduceMotion]);
 
   return <motion.span className={className}>{text}</motion.span>;
 }
@@ -77,8 +82,8 @@ export function ProgressMeter({ value, max, label, valueLabel, tone = 'good' }: 
         role="progressbar"
         aria-label={label}
         aria-valuemin={0}
-        aria-valuemax={max}
-        aria-valuenow={Math.min(Math.max(value, 0), max)}
+        aria-valuemax={Math.max(max, 1)}
+        aria-valuenow={Math.min(Math.max(value, 0), Math.max(max, 1))}
         className="h-1.5 overflow-hidden rounded-sm bg-ink-700"
       >
         <div className={classNames('h-full transition-[width] duration-200', meterColor[tone])} style={{ width: `${fraction * 100}%` }} />
@@ -97,7 +102,7 @@ export function StatusPill({ tone, children }: { tone: Tone; children: ReactNode
   };
   return (
     <span className={classNames('inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 text-xs font-medium', palette[tone])}>
-      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: toneStroke[tone] }} />
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: toneStroke[tone] }} />
       {children}
     </span>
   );

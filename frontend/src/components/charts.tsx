@@ -31,7 +31,7 @@ function Frame({ title, data, error, children }: { title: string; data: MetricPo
     <div className="panel p-4">
       <div className="panel-title mb-3">{title}</div>
       {error ? <div role="alert" className="mb-2 text-xs text-warn">Refresh failed; showing the last received metrics.</div> : null}
-      {data.length > 0 ? <div className="h-56">{children}</div> : <div role={error ? 'alert' : 'status'} className="flex h-56 items-center justify-center text-sm text-slate-400">{error ? 'Chart data is unavailable.' : 'Waiting for live metrics.'}</div>}
+      {data.length > 0 ? <div role="img" aria-label={`${title} chart`} className="h-56">{children}</div> : <div role={error ? 'alert' : 'status'} className="flex h-56 items-center justify-center text-sm text-slate-400">{error ? 'Chart data is unavailable.' : 'Waiting for live metrics.'}</div>}
     </div>
   );
 }

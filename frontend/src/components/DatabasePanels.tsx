@@ -14,11 +14,11 @@ export function QueryPlanTable({ plans, loading, error }: { plans: QueryPlan[]; 
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="sticky top-0 z-10 bg-ink-900 text-[11px] text-slate-400">
             <tr>
-              <th className="pb-2 font-medium">Query</th>
-              <th className="pb-2 font-medium">Plan</th>
-              <th className="pb-2 text-right font-medium">Docs examined</th>
-              <th className="pb-2 text-right font-medium">Returned</th>
-              <th className="pb-2 text-right font-medium">Time</th>
+              <th scope="col" className="pb-2 font-medium">Query</th>
+              <th scope="col" className="pb-2 font-medium">Plan</th>
+              <th scope="col" className="pb-2 text-right font-medium">Docs examined</th>
+              <th scope="col" className="pb-2 text-right font-medium">Returned</th>
+              <th scope="col" className="pb-2 text-right font-medium">Time</th>
             </tr>
           </thead>
           <tbody>

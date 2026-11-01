@@ -31,6 +31,9 @@ export function Layout() {
 
   return (
     <div className="min-h-screen bg-ink-950 lg:flex">
+      <a href="#main-content" className="sr-only fixed left-3 top-3 z-50 bg-ink-900 px-3 py-2 text-sm text-slate-100 focus:not-sr-only">
+        Skip to content
+      </a>
       <aside className="flex shrink-0 flex-col border-b border-line bg-ink-900 lg:sticky lg:top-0 lg:h-screen lg:w-56 lg:border-b-0 lg:border-r">
         <div className="flex h-16 items-center gap-2.5 border-b border-line px-5">
           <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-brand text-ink-950"><Icon name="database" size={17} /></span>
@@ -73,7 +76,7 @@ export function Layout() {
             {shell.data?.topology ? <span className="rounded-sm border border-line px-2 py-1 text-xs text-slate-300">{shell.data.topology.kind}</span> : null}
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1440px] px-4 py-6 lg:px-7 lg:py-7">
+        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1440px] px-4 py-6 lg:px-7 lg:py-7">
           {shell.error ? (
             <div role="status" aria-live="polite" className="mb-5 border-l-2 border-warn bg-ink-900 px-4 py-3 text-sm text-slate-200">
               API is unreachable. Live system data is temporarily unavailable.

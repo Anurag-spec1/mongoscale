@@ -26,19 +26,19 @@ function clock(timestamp: number): string {
 
 interface ChartProps { data: MetricPoint[]; error: string | null }
 
-function Frame({ title, data, error, children }: { title: string; data: MetricPoint[]; error: string | null; children: ReactNode }) {
+function Frame({ title, data, hasActivity, error, children }: { title: string; data: MetricPoint[]; hasActivity: boolean; error: string | null; children: ReactNode }) {
   return (
     <div className="panel p-4">
       <div className="panel-title mb-3">{title}</div>
       {error ? <div role="alert" className="mb-2 text-xs text-warn">Refresh failed; showing the last received metrics.</div> : null}
-      {data.length > 0 ? <div role="img" aria-label={`${title} chart`} className="h-56">{children}</div> : <div role={error ? 'alert' : 'status'} className="flex h-56 items-center justify-center text-sm text-slate-400">{error ? 'Chart data is unavailable.' : 'Waiting for live metrics.'}</div>}
+      {data.length > 0 && hasActivity ? <div role="img" aria-label={`${title} chart`} className="h-56">{children}</div> : <div role={error ? 'alert' : 'status'} className="flex h-56 items-center justify-center text-sm text-slate-400">{error ? 'Chart data is unavailable.' : data.length > 0 ? 'No traffic recorded in this window.' : 'Waiting for live metrics.'}</div>}
     </div>
   );
 }
 
 export function LatencyChart({ data, error }: ChartProps) {
   return (
-    <Frame title="Latency (ms)" data={data} error={error}>
+    <Frame title="Latency (ms)" data={data} hasActivity={data.some((point) => point.p50 > 0 || point.p95 > 0 || point.p99 > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />
@@ -57,7 +57,7 @@ export function LatencyChart({ data, error }: ChartProps) {
 
 export function ThroughputChart({ data, error }: ChartProps) {
   return (
-    <Frame title="Throughput (requests / second)" data={data} error={error}>
+    <Frame title="Throughput (requests / second)" data={data} hasActivity={data.some((point) => point.rps > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />
@@ -73,7 +73,7 @@ export function ThroughputChart({ data, error }: ChartProps) {
 
 export function UsersErrorsChart({ data, error }: ChartProps) {
   return (
-    <Frame title="Virtual users and failed requests" data={data} error={error}>
+    <Frame title="Virtual users and failed requests" data={data} hasActivity={data.some((point) => point.activeUsers > 0 || point.errors > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />
@@ -92,7 +92,7 @@ export function UsersErrorsChart({ data, error }: ChartProps) {
 
 export function MongoOpsChart({ data, error }: ChartProps) {
   return (
-    <Frame title="MongoDB read / write throughput (ops / second)" data={data} error={error}>
+    <Frame title="MongoDB read / write throughput (ops / second)" data={data} hasActivity={data.some((point) => point.mongoReads > 0 || point.mongoWrites > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
           <CartesianGrid stroke="#283039" />

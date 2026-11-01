@@ -73,6 +73,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 export function RequestStream({ history, error }: { history: MetricPoint[]; error: string | null }) {
   const tiles = history.slice(-60);
   const failed = tiles.reduce((sum, point) => sum + point.errors, 0);
+  const hasTraffic = tiles.some((point) => point.rps > 0 || point.errors > 0);
   return (
     <div className="panel p-4">
       <div className="flex items-center justify-between">
@@ -82,7 +83,7 @@ export function RequestStream({ history, error }: { history: MetricPoint[]; erro
         </span> : null}
       </div>
       {error ? <div role="alert" className="mt-2 text-xs text-warn">Refresh failed; showing the last received request data.</div> : null}
-      {tiles.length > 0 ? <div className="mt-3 grid grid-cols-[repeat(30,minmax(0,1fr))] gap-1">
+      {tiles.length > 0 && hasTraffic ? <div className="mt-3 grid grid-cols-[repeat(30,minmax(0,1fr))] gap-1">
         {tiles.map((point) => {
           const critical = point.errorRate >= 10 || point.p95 >= 2000;
           const degraded = point.errorRate >= 2 || point.p95 >= 500;
@@ -97,7 +98,7 @@ export function RequestStream({ history, error }: { history: MetricPoint[]; erro
             />
           );
         })}
-      </div> : <div role={error ? 'alert' : 'status'} className="py-5 text-center text-sm text-slate-400">{error ? 'Request data is unavailable.' : 'Waiting for live request data.'}</div>}
+      </div> : <div role={error ? 'alert' : 'status'} className="py-5 text-center text-sm text-slate-400">{error ? 'Request data is unavailable.' : tiles.length > 0 ? 'No traffic recorded in this window.' : 'Waiting for live request data.'}</div>}
     </div>
   );
 }

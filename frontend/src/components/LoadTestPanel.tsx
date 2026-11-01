@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { api, ApiError } from '../services/api';
 import type { LoadTestRequest, LoadTestStatus } from '../types';
 import { classNames, formatDuration, formatNumber } from '../utils/format';
@@ -67,47 +66,50 @@ export function LoadTestPanel({ status }: Props) {
         </StatusPill>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
+      <div role="group" aria-label="Load test preset" className="mt-4 grid grid-cols-3 border border-line">
         {presets.map((preset, index) => (
           <button
             key={preset.label}
             type="button"
             disabled={running}
+            aria-pressed={!useCustom && selected === index}
             onClick={() => {
               setSelected(index);
               setUseCustom(false);
             }}
             className={classNames(
-              'rounded-xl border px-3 py-2 text-left transition disabled:opacity-50',
-              !useCustom && selected === index ? 'border-brand bg-brand/10' : 'border-line bg-ink-900 hover:border-slate-500',
+              'min-w-0 border-r border-line px-2 py-2.5 text-left transition-colors last:border-r-0 disabled:opacity-50 sm:px-3',
+              !useCustom && selected === index ? 'bg-accent-muted text-slate-100' : 'bg-ink-900 text-slate-300 hover:bg-ink-800',
             )}
           >
-            <div className="text-sm font-semibold text-slate-100">{preset.label}</div>
-            <div className="text-[11px] text-slate-500">{preset.caption}</div>
+            <div className="text-xs font-semibold sm:text-sm">{preset.label}</div>
+            <div className="mt-1 text-[10px] leading-tight text-slate-500">{preset.caption}</div>
           </button>
         ))}
       </div>
 
-      <button type="button" disabled={running} onClick={() => setUseCustom((value) => !value)} className="mt-3 text-xs text-info hover:underline disabled:opacity-50">
-        {useCustom ? 'Use a preset instead' : 'Customize users and duration'}
+      <button type="button" disabled={running} aria-expanded={useCustom} aria-controls="advanced-load-options" onClick={() => setUseCustom((value) => !value)} className="mt-4 text-sm text-brand hover:underline disabled:opacity-50">
+        {useCustom ? 'Hide advanced options' : 'Advanced options'}
       </button>
 
       {useCustom ? (
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <NumberField label="Virtual users" value={custom.users} max={20000} onChange={(users) => setCustom({ ...custom, users })} />
-          <NumberField label="Ramp up (s)" value={custom.rampUpSeconds} max={600} onChange={(rampUpSeconds) => setCustom({ ...custom, rampUpSeconds })} />
-          <NumberField label="Hold (s)" value={custom.holdSeconds} max={600} onChange={(holdSeconds) => setCustom({ ...custom, holdSeconds })} />
-          <NumberField label="Ramp down (s)" value={custom.rampDownSeconds} max={600} onChange={(rampDownSeconds) => setCustom({ ...custom, rampDownSeconds })} />
+        <div id="advanced-load-options" className="mt-3 grid grid-cols-2 gap-3 border-t border-line pt-4">
+          <NumberField label="Virtual users" value={custom.users} max={20000} disabled={running} onChange={(users) => setCustom({ ...custom, users })} />
+          <NumberField label="Ramp up (s)" value={custom.rampUpSeconds} max={600} disabled={running} onChange={(rampUpSeconds) => setCustom({ ...custom, rampUpSeconds })} />
+          <NumberField label="Hold (s)" value={custom.holdSeconds} max={600} disabled={running} onChange={(holdSeconds) => setCustom({ ...custom, holdSeconds })} />
+          <NumberField label="Ramp down (s)" value={custom.rampDownSeconds} max={600} disabled={running} onChange={(rampDownSeconds) => setCustom({ ...custom, rampDownSeconds })} />
           <NumberField
             label="Think time min (s)"
             value={(custom.thinkTimeMinMs ?? 6000) / 1000}
             max={60}
+            disabled={running}
             onChange={(seconds) => setCustom({ ...custom, thinkTimeMinMs: seconds * 1000, thinkTimeMaxMs: Math.max(custom.thinkTimeMaxMs ?? 14000, seconds * 1000) })}
           />
           <NumberField
             label="Think time max (s)"
             value={(custom.thinkTimeMaxMs ?? 14000) / 1000}
             max={60}
+            disabled={running}
             onChange={(seconds) => setCustom({ ...custom, thinkTimeMaxMs: Math.max(seconds * 1000, custom.thinkTimeMinMs ?? 6000) })}
           />
         </div>
@@ -132,9 +134,9 @@ export function LoadTestPanel({ status }: Props) {
       </div>
 
       {error ? (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 rounded-xl border border-danger/50 bg-danger/10 px-3 py-2 text-sm text-danger">
+        <div role="alert" className="mt-4 border-l-2 border-danger bg-status-danger/10 px-3 py-2 text-sm text-danger">
           {error}
-        </motion.div>
+        </div>
       ) : null}
 
       <div className="mt-5 flex gap-3">
@@ -152,7 +154,7 @@ export function LoadTestPanel({ status }: Props) {
   );
 }
 
-function NumberField({ label, value, max, onChange }: { label: string; value: number; max: number; onChange: (value: number) => void }) {
+function NumberField({ label, value, max, onChange, disabled }: { label: string; value: number; max: number; onChange: (value: number) => void; disabled: boolean }) {
   return (
     <label className="block">
       <span className="label">{label}</span>
@@ -161,6 +163,7 @@ function NumberField({ label, value, max, onChange }: { label: string; value: nu
         type="number"
         min={1}
         max={max}
+        disabled={disabled}
         value={value}
         onChange={(event) => onChange(Math.max(1, Math.min(max, Number(event.target.value) || 1)))}
       />

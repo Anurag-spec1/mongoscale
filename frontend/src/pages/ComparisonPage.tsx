@@ -144,13 +144,13 @@ export default function ComparisonPage() {
         {results.some((result) => loadLevels.includes(result.targetUsers)) ? <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ left: -8, right: 8 }}>
-              <CartesianGrid stroke="#283039" />
-              <XAxis dataKey="name" tick={{ fill: '#9aa5b1', fontSize: 11 }} />
-              <YAxis tick={{ fill: '#9aa5b1', fontSize: 11 }} />
-              <Tooltip contentStyle={{ background: '#171c22', border: '1px solid #2a313a', borderRadius: 4, fontSize: 12 }} />
+              <CartesianGrid stroke="#332640" />
+              <XAxis dataKey="name" tick={{ fill: '#c1b4ce', fontSize: 11 }} />
+              <YAxis tick={{ fill: '#c1b4ce', fontSize: 11 }} />
+              <Tooltip contentStyle={{ background: '#191322', border: '1px solid #49365a', borderRadius: 8, fontSize: 12 }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="1,000 users" fill="#73a7ff" radius={[2, 2, 0, 0]} />
-              <Bar dataKey="10,000 users" fill="#a4adb8" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="1,000 users" fill="#c579f3" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="10,000 users" fill="#e78ad7" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div> : <p className="py-10 text-center text-sm text-slate-400">No runs at these load levels are available to chart.</p>}

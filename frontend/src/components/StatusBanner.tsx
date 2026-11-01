@@ -88,7 +88,7 @@ export function RequestStream({ history, error }: { history: MetricPoint[]; erro
           const critical = point.errorRate >= 10 || point.p95 >= 2000;
           const degraded = point.errorRate >= 2 || point.p95 >= 500;
           const idle = point.rps < 1;
-          const color = idle ? '#1c2740' : critical ? '#ff4d6a' : degraded ? '#fbbf24' : '#22d3a5';
+          const color = idle ? '#332640' : critical ? '#ef7379' : degraded ? '#e9b65a' : '#c579f3';
           return (
             <div
               key={point.timestamp}

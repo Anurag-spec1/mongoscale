@@ -110,7 +110,7 @@ interface ShardProps {
 
 export function ShardView({ distribution }: ShardProps) {
   const total = distribution.shards.reduce((sum, shard) => sum + shard.documents, 0);
-  const palette = ['#73a7ff', '#a4adb8', '#66727f', '#d3dae2'];
+  const palette = ['#c579f3', '#e78ad7', '#a992c3', '#8564a7'];
   return (
     <div className="panel p-5">
       <div className="flex items-center justify-between">
@@ -191,7 +191,7 @@ export function ArchitectureDiagram({ tuning, topology, rps }: DiagramProps) {
         <Arrow active={flowing} />
         <Box
           title="Go API"
-          lines={[`pool ≤ ${tuning?.maxPoolSize ?? '-'} connections`, tuning?.rateLimit ? 'rate limiting on' : 'rate limiting off', tuning?.projections ? 'projections + keyset paging' : 'full documents + skip paging']}
+          lines={[`Connection pool: up to ${tuning?.maxPoolSize ?? '-'} connections`, tuning?.rateLimit ? 'Rate limiting enabled' : 'Rate limiting disabled', tuning?.projections ? 'Projections and keyset pagination' : 'Full documents and offset pagination']}
           tone={tuning?.mode === 'unoptimized' ? 'bad' : 'good'}
         />
         <Arrow active={flowing && Boolean(tuning?.cache)} />

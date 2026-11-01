@@ -11,14 +11,14 @@ import {
 } from 'recharts';
 import type { MetricPoint } from '../types';
 
-const axisStyle = { fill: '#9aa5b1', fontSize: 11 };
+const axisStyle = { fill: '#c1b4ce', fontSize: 11 };
 const tooltipStyle = {
-  background: '#171c22',
-  border: '1px solid #2a313a',
-  borderRadius: 4,
+  background: '#191322',
+  border: '1px solid #49365a',
+  borderRadius: 8,
   fontSize: 12,
 };
-const series = { primary: '#73a7ff', secondary: '#d3dae2', tertiary: '#8d99a7', error: '#ef7379' };
+const series = { primary: '#c579f3', secondary: '#e78ad7', tertiary: '#a992c3', error: '#ef7379' };
 
 function clock(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString('en-GB');
@@ -41,7 +41,7 @@ export function LatencyChart({ data, error }: ChartProps) {
     <Frame title="Latency (ms)" data={data} hasActivity={data.some((point) => point.p50 > 0 || point.p95 > 0 || point.p99 > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
-          <CartesianGrid stroke="#283039" />
+          <CartesianGrid stroke="#332640" />
           <XAxis dataKey="timestamp" tickFormatter={clock} tick={axisStyle} minTickGap={48} />
           <YAxis tick={axisStyle} />
           <Tooltip contentStyle={tooltipStyle} labelFormatter={(value) => clock(Number(value))} />
@@ -60,7 +60,7 @@ export function ThroughputChart({ data, error }: ChartProps) {
     <Frame title="Throughput (requests / second)" data={data} hasActivity={data.some((point) => point.rps > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
-          <CartesianGrid stroke="#283039" />
+          <CartesianGrid stroke="#332640" />
           <XAxis dataKey="timestamp" tickFormatter={clock} tick={axisStyle} minTickGap={48} />
           <YAxis tick={axisStyle} />
           <Tooltip contentStyle={tooltipStyle} labelFormatter={(value) => clock(Number(value))} />
@@ -76,7 +76,7 @@ export function UsersErrorsChart({ data, error }: ChartProps) {
     <Frame title="Virtual users and failed requests" data={data} hasActivity={data.some((point) => point.activeUsers > 0 || point.errors > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
-          <CartesianGrid stroke="#283039" />
+          <CartesianGrid stroke="#332640" />
           <XAxis dataKey="timestamp" tickFormatter={clock} tick={axisStyle} minTickGap={48} />
           <YAxis yAxisId="users" tick={axisStyle} />
           <YAxis yAxisId="errors" orientation="right" tick={axisStyle} />
@@ -95,7 +95,7 @@ export function MongoOpsChart({ data, error }: ChartProps) {
     <Frame title="MongoDB read / write throughput (ops / second)" data={data} hasActivity={data.some((point) => point.mongoReads > 0 || point.mongoWrites > 0)} error={error}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -12, right: 8, top: 4 }}>
-          <CartesianGrid stroke="#283039" />
+          <CartesianGrid stroke="#332640" />
           <XAxis dataKey="timestamp" tickFormatter={clock} tick={axisStyle} minTickGap={48} />
           <YAxis tick={axisStyle} />
           <Tooltip contentStyle={tooltipStyle} labelFormatter={(value) => clock(Number(value))} />

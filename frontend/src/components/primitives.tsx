@@ -21,11 +21,11 @@ const toneBorder: Record<Tone, string> = {
 };
 
 const toneStroke: Record<Tone, string> = {
-  neutral: '#94a3b8',
-  good: '#22d3a5',
-  warn: '#fbbf24',
-  bad: '#ff4d6a',
-  info: '#38bdf8',
+  neutral: '#c1b4ce',
+  good: '#55c596',
+  warn: '#e9b65a',
+  bad: '#ef7379',
+  info: '#c579f3',
 };
 
 export function toneColor(tone: Tone): string {
@@ -75,7 +75,7 @@ export function ProgressMeter({ value, max, label, valueLabel, tone = 'good' }: 
   return (
     <div className="min-w-0 space-y-2">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="truncate text-xs text-slate-400">{label}</span>
+        <span className="min-w-0 break-words text-xs leading-4 text-slate-400">{label}</span>
         <span className="shrink-0 font-mono text-xs text-slate-200">{valueLabel}</span>
       </div>
       <div

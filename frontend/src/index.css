@@ -4,16 +4,17 @@
 
 :root {
   color-scheme: dark;
-  --canvas: #0b0d10;
-  --surface: #11151a;
-  --surface-raised: #171c22;
-  --surface-hover: #20262e;
-  --border: #2a313a;
-  --text-primary: #e8edf2;
-  --text-secondary: #a4adb8;
-  --text-muted: #77828f;
-  --accent: #73a7ff;
-  --accent-muted: #1c2c45;
+  --canvas: #09070e;
+  --surface: #110d18;
+  --surface-raised: #191322;
+  --surface-hover: #251b32;
+  --border: #332640;
+  --text-primary: #f2edf8;
+  --text-secondary: #c1b4ce;
+  --text-muted: #91839e;
+  --accent: #c579f3;
+  --accent-muted: #312044;
+  --accent-pink: #e78ad7;
   --status-good: #55c596;
   --status-warning: #e9b65a;
   --status-danger: #ef7379;
@@ -34,6 +35,11 @@ body,
 body {
   @apply bg-ink-950 font-sans text-slate-200 antialiased;
   font-variant-numeric: tabular-nums;
+  background-image:
+    radial-gradient(ellipse at 12% 0%, rgba(128, 67, 170, 0.18), transparent 34rem),
+    radial-gradient(ellipse at 96% 28%, rgba(103, 45, 122, 0.11), transparent 30rem),
+    linear-gradient(135deg, #09070e 0%, #0c0812 55%, #0a0710 100%);
+  background-attachment: fixed;
 }
 
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
@@ -46,13 +52,15 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1c2740;
-  border-radius: 4px;
+  background: #49365a;
+  border-radius: 8px;
 }
 
 @layer components {
   .panel {
-    @apply rounded-md border border-line bg-ink-900;
+    @apply rounded-xl border border-line bg-ink-900;
+    background-image: linear-gradient(145deg, rgba(30, 22, 40, 0.96), rgba(15, 11, 21, 0.98));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
   }
   .panel-title {
     @apply text-sm font-semibold text-slate-200;
@@ -62,6 +70,7 @@ body {
   }
   .btn-primary {
     @apply btn bg-brand text-ink-950 hover:brightness-110;
+    background-image: linear-gradient(105deg, #d183f5, #b55de3);
   }
   .btn-ghost {
     @apply btn border border-line bg-transparent text-slate-200 hover:bg-ink-700;
@@ -70,7 +79,7 @@ body {
     @apply btn bg-danger text-white hover:brightness-110;
   }
   .input {
-    @apply w-full rounded-sm border border-line bg-ink-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand;
+    @apply w-full rounded-md border border-line bg-ink-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand;
   }
   .label {
     @apply mb-1 block text-xs font-medium text-slate-300;

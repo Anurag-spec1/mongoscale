@@ -1,6 +1,5 @@
 node_modules/
 dist/
-.env
 *.log
 backend/bin/
 backend/tmp/
@@ -9,3 +8,4 @@ frontend/dist/
 load-tests/results/*.json
 !load-tests/results/.gitkeep
 .DS_Store
+config.bat

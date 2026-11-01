@@ -116,7 +116,7 @@ export function HealthGauges({ metrics, mongo, loading, error }: { metrics: Metr
     <div className="panel p-5">
       <span className="panel-title">Database health</span>
       {error ? <div role="alert" className="mt-3 text-xs text-warn">Refresh failed; showing the last received health data.</div> : null}
-      <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-4">
+      <div className="mt-4 grid grid-cols-1 gap-y-4">
         <ProgressMeter value={pool?.inUse ?? 0} max={pool?.max ?? 0} label="Connection pool in use" valueLabel={pool ? `${pool.inUse} / ${pool.max}` : 'Unavailable'} tone={poolTone(poolPercent)} />
         <ProgressMeter value={current?.cpuPercent ?? 0} max={100} label="API CPU utilization" valueLabel={current ? `${current.cpuPercent.toFixed(0)}% / 100%` : 'Unavailable'} tone={cpuTone(current?.cpuPercent ?? 0)} />
         <ProgressMeter
@@ -128,7 +128,7 @@ export function HealthGauges({ metrics, mongo, loading, error }: { metrics: Metr
         />
         <ProgressMeter value={cacheRate} max={100} label="Cache hit rate" valueLabel={metrics ? metrics.cache.enabled ? `${cacheRate.toFixed(0)}% / 100%` : 'Off' : 'Unavailable'} tone={metrics?.cache.enabled ? 'good' : 'neutral'} />
       </div>
-      <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+      <dl className="mt-5 grid grid-cols-1 gap-y-2 text-sm">
         <Fact label="Connection pool waiting" value={formatNumber(pool?.waiting ?? 0)} bad={(pool?.waiting ?? 0) > 0} />
         <Fact label="Connection checkout failures" value={formatNumber(pool?.failed ?? 0)} bad={(pool?.failed ?? 0) > 0} />
         <Fact label="Slow queries" value={formatNumber(metrics?.slowQueries ?? 0)} bad={(metrics?.slowQueries ?? 0) > 100} />
@@ -142,9 +142,9 @@ export function HealthGauges({ metrics, mongo, loading, error }: { metrics: Metr
 
 function Fact({ label, value, bad = false }: { label: string; value: string; bad?: boolean }) {
   return (
-    <div>
-      <dt className="text-xs text-slate-400">{label}</dt>
-      <dd className={classNames('font-semibold tabular-nums', bad ? 'text-danger' : 'text-slate-100')}>{value}</dd>
+    <div className="flex items-center justify-between gap-3">
+      <dt className="min-w-0 text-xs text-slate-400">{label}</dt>
+      <dd className={classNames('shrink-0 font-semibold tabular-nums', bad ? 'text-danger' : 'text-slate-100')}>{value}</dd>
     </div>
   );
 }

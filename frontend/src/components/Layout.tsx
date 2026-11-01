@@ -1,6 +1,5 @@
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { isAdmin, useAuthStore } from '../store/auth';
-import { useCartStore } from '../store/cart';
 import { classNames } from '../utils/format';
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -9,7 +8,6 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 export function Layout() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const cartCount = useCartStore((state) => state.lines.reduce((sum, line) => sum + line.quantity, 0));
 
   return (
     <div className="min-h-screen">
@@ -22,14 +20,6 @@ export function Layout() {
             </span>
           </Link>
           <nav className="flex flex-1 flex-wrap items-center gap-1">
-            <NavLink to="/" end className={linkClass}>
-              Catalog
-            </NavLink>
-            {user ? (
-              <NavLink to="/orders" className={linkClass}>
-                Orders
-              </NavLink>
-            ) : null}
             {isAdmin(user) ? (
               <>
                 <NavLink to="/dashboard" className={linkClass}>
@@ -44,10 +34,6 @@ export function Layout() {
               </>
             ) : null}
           </nav>
-          <Link to="/cart" className="btn-ghost relative !px-3 !py-1.5">
-            Cart
-            {cartCount > 0 ? <span className="rounded-full bg-brand px-1.5 text-xs font-bold text-ink-950">{cartCount}</span> : null}
-          </Link>
           {user ? (
             <div className="flex items-center gap-3">
               <span className="hidden text-sm text-slate-400 sm:block">{user.name}</span>

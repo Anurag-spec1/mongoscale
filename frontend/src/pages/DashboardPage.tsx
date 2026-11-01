@@ -3,7 +3,7 @@ import { HealthGauges, IndexUsageList, QueryPlanTable } from '../components/Data
 import { LatencyChart, MongoOpsChart, ThroughputChart, UsersErrorsChart } from '../components/charts';
 import { LoadTestPanel } from '../components/LoadTestPanel';
 import { ModeSwitcher } from '../components/ModeSwitcher';
-import { MetricCard, StatusPill, type Tone } from '../components/primitives';
+import { MetricCard, type Tone } from '../components/primitives';
 import { RequestStream, StatusBanner } from '../components/StatusBanner';
 import { usePolling } from '../hooks/usePolling';
 import { api } from '../services/api';
@@ -39,18 +39,12 @@ export default function DashboardPage() {
   const history = snapshot?.history ?? [];
   const status = snapshot?.status ?? 'idle';
   const stressed = status === 'critical';
-  const tuning = metrics.data?.tuning;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm text-slate-400">Server metrics refresh every second and include built-in test and k6 traffic.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {tuning ? <StatusPill tone={tuning.mode === 'unoptimized' ? 'bad' : 'good'}>{tuning.label}</StatusPill> : null}
-          {metrics.data ? <StatusPill tone="info">{metrics.data.topology.kind}</StatusPill> : null}
-          {metrics.error ? <StatusPill tone="bad">API unreachable</StatusPill> : null}
         </div>
       </div>
 

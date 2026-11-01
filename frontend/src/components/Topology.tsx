@@ -90,11 +90,12 @@ function Node({ member, x, y, big = false }: { member: MemberStatus; x: number; 
   const tone = stateTone(member);
   const color = stateColor(tone);
   const radius = big ? 30 : 24;
+  const label = member.state === 'PRIMARY' ? 'Primary' : member.state === 'SECONDARY' ? 'Secondary' : member.state.slice(0, 7);
   return (
     <g>
       <circle cx={x} cy={y} r={radius} fill="var(--surface)" stroke={color} strokeWidth={1.5} />
-      <text x={x} y={y + 4} textAnchor="middle" fill={color} fontSize={big ? 12 : 10} fontWeight={600}>
-        {member.state === 'PRIMARY' ? 'Primary' : member.state === 'SECONDARY' ? 'Secondary' : member.state.slice(0, 7)}
+      <text x={x} y={y + 4} textAnchor="middle" fill={color} fontSize={member.state === 'SECONDARY' ? 8 : big ? 12 : 10} fontWeight={600}>
+        {label}
       </text>
       <text x={x} y={y + radius + 16} textAnchor="middle" fill="#a4adb8" fontSize={11} className="font-mono">
         {member.name.split(':')[0]}

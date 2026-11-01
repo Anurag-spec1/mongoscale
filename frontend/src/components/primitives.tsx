@@ -1,22 +1,22 @@
 import { useEffect, type ReactNode } from 'react';
-import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 import { classNames, formatNumber } from '../utils/format';
 
 export type Tone = 'neutral' | 'good' | 'warn' | 'bad' | 'info';
 
 const toneText: Record<Tone, string> = {
   neutral: 'text-slate-100',
-  good: 'text-brand',
-  warn: 'text-warn',
-  bad: 'text-danger',
+  good: 'text-status-good',
+  warn: 'text-status-warn',
+  bad: 'text-status-danger',
   info: 'text-info',
 };
 
 const toneBorder: Record<Tone, string> = {
   neutral: 'border-line',
-  good: 'border-brand/40',
-  warn: 'border-warn/50',
-  bad: 'border-danger/70',
+  good: 'border-status-good/40',
+  warn: 'border-status-warn/50',
+  bad: 'border-status-danger/70',
   info: 'border-info/40',
 };
 
@@ -41,71 +41,68 @@ interface CounterProps {
 export function AnimatedCounter({ value, format = formatNumber, className }: CounterProps) {
   const motionValue = useMotionValue(value);
   const text = useTransform(motionValue, (latest) => format(latest));
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const controls = animate(motionValue, value, { duration: 0.6, ease: 'easeOut' });
+    if (reduceMotion) {
+      motionValue.set(value);
+      return undefined;
+    }
+    const controls = animate(motionValue, value, { duration: 0.18, ease: 'easeOut' });
     return () => controls.stop();
-  }, [motionValue, value]);
+  }, [motionValue, value, reduceMotion]);
 
   return <motion.span className={className}>{text}</motion.span>;
 }
 
-interface RingProps {
+interface MeterProps {
   value: number;
   max: number;
   label: string;
-  caption?: string;
+  valueLabel: string;
   tone?: Tone;
-  size?: number;
 }
 
-export function ProgressRing({ value, max, label, caption, tone = 'good', size = 104 }: RingProps) {
-  const radius = size / 2 - 9;
-  const circumference = 2 * Math.PI * radius;
+export function ProgressMeter({ value, max, label, valueLabel, tone = 'good' }: MeterProps) {
   const fraction = max > 0 ? Math.min(Math.max(value / max, 0), 1) : 0;
+  const meterColor: Record<Tone, string> = {
+    neutral: 'bg-slate-500',
+    good: 'bg-status-good',
+    warn: 'bg-status-warn',
+    bad: 'bg-status-danger',
+    info: 'bg-brand',
+  };
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="-rotate-90">
-          <circle cx={size / 2} cy={size / 2} r={radius} stroke="#1c2740" strokeWidth={8} fill="none" />
-          <motion.circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={toneStroke[tone]}
-            strokeWidth={8}
-            strokeLinecap="round"
-            fill="none"
-            strokeDasharray={circumference}
-            initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset: circumference * (1 - fraction) }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={classNames('text-lg font-bold tabular-nums', toneText[tone])}>{Math.round(fraction * 100)}%</span>
-          {caption ? <span className="text-[10px] text-slate-500">{caption}</span> : null}
-        </div>
+    <div className="min-w-0 space-y-2">
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="truncate text-xs text-slate-400">{label}</span>
+        <span className="shrink-0 font-mono text-xs text-slate-200">{valueLabel}</span>
       </div>
-      <span className="text-xs font-medium text-slate-400">{label}</span>
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={Math.max(max, 1)}
+        aria-valuenow={Math.min(Math.max(value, 0), Math.max(max, 1))}
+        className="h-1.5 overflow-hidden rounded-sm bg-ink-700"
+      >
+        <div className={classNames('h-full transition-[width] duration-200', meterColor[tone])} style={{ width: `${fraction * 100}%` }} />
+      </div>
     </div>
   );
 }
 
-export function StatusPill({ tone, children, pulse = false }: { tone: Tone; children: ReactNode; pulse?: boolean }) {
+export function StatusPill({ tone, children }: { tone: Tone; children: ReactNode }) {
   const palette: Record<Tone, string> = {
-    neutral: 'bg-slate-700/40 text-slate-300 border-slate-600/60',
-    good: 'bg-brand/10 text-brand border-brand/40',
-    warn: 'bg-warn/10 text-warn border-warn/40',
-    bad: 'bg-danger/15 text-danger border-danger/50',
-    info: 'bg-info/10 text-info border-info/40',
+    neutral: 'bg-ink-700 text-slate-300 border-line',
+    good: 'bg-status-good/10 text-status-good border-status-good/40',
+    warn: 'bg-status-warn/10 text-status-warn border-status-warn/40',
+    bad: 'bg-status-danger/10 text-status-danger border-status-danger/40',
+    info: 'bg-accent-muted text-brand border-line',
   };
   return (
-    <span className={classNames('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold', palette[tone])}>
-      <span
-        className={classNames('h-1.5 w-1.5 rounded-full', pulse && 'animate-heartbeat')}
-        style={{ backgroundColor: toneStroke[tone] }}
-      />
+    <span className={classNames('inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 text-xs font-medium', palette[tone])}>
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: toneStroke[tone] }} />
       {children}
     </span>
   );
@@ -113,28 +110,22 @@ export function StatusPill({ tone, children, pulse = false }: { tone: Tone; chil
 
 interface MetricCardProps {
   label: string;
-  value: number;
+  value: number | null;
   format?: (value: number) => string;
   unit?: string;
   hint?: string;
   tone?: Tone;
-  shake?: boolean;
 }
 
-export function MetricCard({ label, value, format, unit, hint, tone = 'neutral', shake = false }: MetricCardProps) {
-  const shaking = shake && tone === 'bad';
+export function MetricCard({ label, value, format, unit, hint, tone = 'neutral' }: MetricCardProps) {
   return (
-    <motion.div
-      className={classNames('panel relative overflow-hidden p-4 transition-colors', toneBorder[tone], shaking && 'shadow-glowRed')}
-      animate={shaking ? { x: [0, -4, 4, -3, 3, 0] } : { x: 0 }}
-      transition={shaking ? { duration: 0.5, repeat: Infinity, repeatDelay: 1.1 } : { duration: 0.2 }}
-    >
-      <div className="panel-title">{label}</div>
+    <div className={classNames('panel border-t-2 p-4', toneBorder[tone])}>
+      <div className="text-xs font-medium text-slate-400">{label}</div>
       <div className="mt-2 flex items-baseline gap-1.5">
-        <AnimatedCounter value={value} format={format} className={classNames('text-3xl font-bold tabular-nums', toneText[tone])} />
+        {value === null ? <span className="text-3xl font-bold text-slate-500">--</span> : <AnimatedCounter value={value} format={format} className={classNames('text-3xl font-bold tabular-nums', toneText[tone])} />}
         {unit ? <span className="text-sm text-slate-500">{unit}</span> : null}
       </div>
       {hint ? <div className="mt-1 text-xs text-slate-500">{hint}</div> : null}
-    </motion.div>
+    </div>
   );
 }

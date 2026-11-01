@@ -1,33 +1,34 @@
 # MongoScale
 
-MongoScale is a MongoDB performance lab for a college presentation. It is a complete e-commerce platform (Go API, React dashboard, MongoDB, Redis, k6) that you can run in two states:
+MongoScale is a MongoDB performance demo for a college presentation. It pairs an e-commerce Go API and its load-test workflows with an admin-only React observability console, MongoDB, and Redis. Run it in two states:
 
 - **Unoptimized**: no secondary indexes, regex search, skip pagination, full documents, a 10-connection pool and primary-only reads. Under load it times out and returns errors.
 - **Fully optimized**: indexes, replica-set reads and writes, hashed sharding, projections, keyset pagination, Redis caching, rate limiting and a 200-connection pool. Under much more load it stays fast.
 
-The dashboard turns that difference into something an audience can see: a red "SYSTEM UNDER STRESS / CRASH RISK" state with shaking cards and failing requests, and a green "SYSTEM HEALTHY / SCALED" state with stable charts, healthy replicas and balanced shards.
+The dashboard makes that difference visible with live charts, a clear red under-stress banner, a green healthy banner, replica health, and shard distribution.
 
 > **Honest note about results.** Every number in the dashboard is measured live from the API you are running. The numbers in the "Expected results" section are typical ranges, not guarantees. They depend on your machine's CPU, RAM and Docker settings. Run the unoptimized test once before the presentation so you know what your machine does.
 
 ## Contents
 
 1. [Quick start](#quick-start)
-2. [Architecture](#architecture)
-3. [MongoDB collection design](#mongodb-collection-design)
-4. [Indexing strategy](#indexing-strategy)
-5. [Replica set](#replica-set)
-6. [Sharding](#sharding)
-7. [The five optimization modes](#the-five-optimization-modes)
-8. [Docker setup](#docker-setup)
-9. [Environment variables](#environment-variables)
-10. [API documentation](#api-documentation)
-11. [k6 load tests](#k6-load-tests)
-12. [Running the unoptimized demo](#running-the-unoptimized-demo)
-13. [Running the optimized demo](#running-the-optimized-demo)
-14. [Expected results](#expected-results)
-15. [Five-minute presentation script](#five-minute-presentation-script)
-16. [Project layout](#project-layout)
-17. [Known limitations](#known-limitations)
+2. [Screenshots](#screenshots)
+3. [Architecture](#architecture)
+4. [MongoDB collection design](#mongodb-collection-design)
+5. [Indexing strategy](#indexing-strategy)
+6. [Replica set](#replica-set)
+7. [Sharding](#sharding)
+8. [The five optimization modes](#the-five-optimization-modes)
+9. [Docker setup](#docker-setup)
+10. [Environment variables](#environment-variables)
+11. [API documentation](#api-documentation)
+12. [k6 load tests](#k6-load-tests)
+13. [Running the unoptimized demo](#running-the-unoptimized-demo)
+14. [Running the optimized demo](#running-the-optimized-demo)
+15. [Expected results](#expected-results)
+16. [Five-minute presentation script](#five-minute-presentation-script)
+17. [Project layout](#project-layout)
+18. [Known limitations](#known-limitations)
 
 ## Quick start
 
@@ -44,13 +45,29 @@ Then open:
 | http://localhost:3000 | React app and dashboard |
 | http://localhost:8080/health | API health check |
 
-Sign in with the admin account (defaults: `admin@mongoscale.dev` / `Admin@12345`, set by `ADMIN_EMAIL` and `ADMIN_PASSWORD`). Customers seeded by the seed command use `user00001@example.com` to `user05000@example.com` with the password `Password123!`.
+Sign in with the admin account (defaults: `admin@mongoscale.dev` / `Admin@12345`, set by `ADMIN_EMAIL` and `ADMIN_PASSWORD`). The frontend is admin-only: `/` redirects signed-in admins to the dashboard and everyone else to **Admin sign in**. Seeded customer accounts and commerce endpoints remain available to the backend and k6 journeys; there is no customer registration, catalog, cart, or order UI.
 
 The first start seeds 5,000 users, 500 products, 50,000 orders and 100,000 reviews. This takes about a minute. Seeding is idempotent: later starts detect the data and skip it.
 
 To change settings, copy `.env.example` to `.env` first. Every variable has a working default, so this is optional for a local demo.
 
 The Go dependencies are resolved while the image builds (`go mod tidy` runs in the Dockerfile). To commit a `go.sum`, run `make tidy` once.
+
+## Screenshots
+
+These screenshots use mocked API responses for visual review. The running dashboard reads all metrics and status from the API; the example values below are illustrative and are not benchmark results.
+
+![Admin sign in](frontend/public/admin-login.png)
+
+![Dashboard with no traffic](frontend/public/dashboard-idle.png)
+
+![Healthy dashboard](frontend/public/dashboard-healthy.png)
+
+![Dashboard under stress](frontend/public/dashboard-stressed.png)
+
+![MongoDB architecture](frontend/public/architecture.png)
+
+![Before and after comparison](frontend/public/comparison.png)
 
 ## Architecture
 
@@ -340,10 +357,10 @@ Notes for 10,000 users: k6 needs about 2-4 GB of RAM at that level, and the whol
 ## Running the unoptimized demo
 
 1. `docker compose up --build` and wait until the frontend is reachable.
-2. Sign in as admin and open **Dashboard**. The banner shows `SYSTEM IDLE`.
+2. Sign in as admin and open **Dashboard**. The banner shows **System idle**.
 3. Confirm the mode is **Unoptimized**. Scroll to the query plans: `COLLSCAN` in red, with thousands of documents examined.
 4. Press **Start 1,000 user test**.
-5. Watch the p95 latency climb, the connection pool fill to 10/10 with a growing waiting queue, the request stream turn red and the banner switch to **SYSTEM UNDER STRESS / CRASH RISK**.
+5. Watch p95 latency climb, the connection pool fill to 10/10 with a growing waiting queue, the request stream turn red, and the banner switch to **System under stress**.
 6. When the run finishes, the result is stored for the comparison screen.
 
 ## Running the optimized demo
@@ -351,7 +368,7 @@ Notes for 10,000 users: k6 needs about 2-4 GB of RAM at that level, and the whol
 1. Keep the stack running, or start a fresh one with `INITIAL_MODE=fully-optimized docker compose up --build`.
 2. On the dashboard, switch to **Fully optimized**. Wait a few seconds for the indexes to build. The query plans turn to green `IXSCAN`.
 3. Press **Start 10,000 user test**.
-4. Watch latency stay flat, errors stay near zero and the banner show **SYSTEM HEALTHY / SCALED**. The Redis hit rate climbs.
+4. Watch latency stay flat, errors stay near zero, and the banner show **System healthy**. The Redis hit rate climbs.
 5. For the replica set and shards, run `docker compose -f docker-compose.replica.yml up --build` or the sharded file, open **Architecture**, and trigger a failover.
 6. Open **Before / After** to see unoptimized at 1,000 users next to fully optimized at 10,000.
 

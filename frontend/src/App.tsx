@@ -1,27 +1,18 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Layout, RequireAuth } from './components/Layout';
+import { isAdmin, useAuthStore } from './store/auth';
 import ArchitecturePage from './pages/ArchitecturePage';
-import CartPage from './pages/CartPage';
-import CatalogPage from './pages/CatalogPage';
 import ComparisonPage from './pages/ComparisonPage';
 import DashboardPage from './pages/DashboardPage';
-import { LoginPage, RegisterPage } from './pages/AuthPages';
-import OrdersPage from './pages/OrdersPage';
-import ProductPage from './pages/ProductPage';
+import { LoginPage } from './pages/AuthPages';
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<CatalogPage />} />
-        <Route path="products/:id" element={<ProductPage />} />
-        <Route path="cart" element={<CartPage />} />
+        <Route index element={<HomeRedirect />} />
         <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
         <Route element={<RequireAuth />}>
-          <Route path="orders" element={<OrdersPage />} />
-        </Route>
-        <Route element={<RequireAuth admin />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="architecture" element={<ArchitecturePage />} />
           <Route path="comparison" element={<ComparisonPage />} />
@@ -30,4 +21,9 @@ export default function App() {
       </Route>
     </Routes>
   );
+}
+
+function HomeRedirect() {
+  const user = useAuthStore((state) => state.user);
+  return <Navigate to={isAdmin(user) ? '/dashboard' : '/login'} replace />;
 }

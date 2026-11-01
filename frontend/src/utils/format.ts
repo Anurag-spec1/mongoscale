@@ -1,6 +1,5 @@
 const numberFormat = new Intl.NumberFormat('en-IN');
 const compactFormat = new Intl.NumberFormat('en-IN', { notation: 'compact', maximumFractionDigits: 1 });
-const currencyFormat = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
 
 export function formatNumber(value: number): string {
   return numberFormat.format(Math.round(value));
@@ -8,10 +7,6 @@ export function formatNumber(value: number): string {
 
 export function formatCompact(value: number): string {
   return compactFormat.format(value);
-}
-
-export function formatCurrency(value: number): string {
-  return currencyFormat.format(value);
 }
 
 export function formatMillis(value: number): string {
@@ -41,6 +36,3 @@ export function classNames(...values: (string | false | null | undefined)[]): st
   return values.filter(Boolean).join(' ');
 }
 
-export function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-}

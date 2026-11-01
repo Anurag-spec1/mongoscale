@@ -3,29 +3,39 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: { 950: '#05070d', 900: '#080c15', 800: '#0d1320', 700: '#131b2d' },
-        line: '#1c2740',
-        brand: { DEFAULT: '#22d3a5', dim: '#0f8a6c' },
-        danger: { DEFAULT: '#ff4d6a', dim: '#7a1d2e' },
-        warn: { DEFAULT: '#fbbf24', dim: '#7a5a0a' },
-        info: { DEFAULT: '#38bdf8', dim: '#0c4a6e' },
-        violet: { DEFAULT: '#a78bfa' },
+        ink: { 950: 'var(--canvas)', 900: 'var(--surface)', 800: 'var(--surface-raised)', 700: 'var(--surface-hover)' },
+        line: 'var(--border)',
+        brand: { DEFAULT: 'var(--accent)', dim: 'var(--accent-muted)' },
+        danger: { DEFAULT: 'var(--status-danger)', dim: 'var(--status-danger-muted)' },
+        warn: { DEFAULT: 'var(--status-warning)', dim: 'var(--status-warning-muted)' },
+        info: { DEFAULT: 'var(--accent)', dim: 'var(--accent-muted)' },
+        violet: { DEFAULT: 'var(--accent)' },
+        status: {
+          good: 'var(--status-good)',
+          warn: 'var(--status-warning)',
+          danger: 'var(--status-danger)',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['Inter Variable', 'sans-serif'],
+        mono: ['JetBrains Mono Variable', 'monospace'],
       },
-      boxShadow: {
-        glowGreen: '0 0 40px -10px rgba(34, 211, 165, 0.45)',
-        glowRed: '0 0 40px -8px rgba(255, 77, 106, 0.55)',
+      spacing: {
+        1.5: '6px',
+        2.5: '10px',
+        3.5: '14px',
       },
-      keyframes: {
-        sweep: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
-        heartbeat: { '0%, 100%': { transform: 'scale(1)', opacity: '1' }, '50%': { transform: 'scale(1.35)', opacity: '0.55' } },
+      borderRadius: {
+        sm: '6px',
+        md: '8px',
+        lg: '8px',
+        xl: '8px',
+        '2xl': '8px',
+        '3xl': '8px',
       },
-      animation: {
-        sweep: 'sweep 2.2s linear infinite',
-        heartbeat: 'heartbeat 1.4s ease-in-out infinite',
+      fontSize: {
+        xxs: ['0.6875rem', { lineHeight: '1rem' }],
+        metric: ['1.75rem', { lineHeight: '2rem' }],
       },
     },
   },

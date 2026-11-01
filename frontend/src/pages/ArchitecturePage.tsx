@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { ArchitectureDiagram, ReplicaTopology, ShardView } from '../components/Topology';
 import { StatusPill } from '../components/primitives';
 import { usePolling } from '../hooks/usePolling';
@@ -31,17 +30,17 @@ export default function ArchitecturePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-100">MongoDB architecture</h1>
-        <p className="mt-1 text-sm text-slate-500">Live topology, replica-set health and shard distribution.</p>
-      </div>
+      <p className="text-sm text-slate-400">Live topology, replica-set health and shard distribution.</p>
 
       <ArchitectureDiagram tuning={metrics.data?.tuning} topology={status?.topology} rps={metrics.data?.snapshot.current.rps ?? 0} />
 
+      {mongo.loading && !status ? <div role="status" className="border border-line px-4 py-3 text-sm text-slate-400">Loading MongoDB topology…</div> : null}
+      {mongo.error ? <div role="alert" className="border-l-2 border-danger bg-status-danger/10 px-4 py-3 text-sm text-danger">{mongo.error}</div> : null}
+
       {notice ? (
-        <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-info/40 bg-info/10 px-4 py-3 text-sm text-info">
+        <div role="status" aria-live="polite" className="border-l-2 border-info bg-accent-muted px-4 py-3 text-sm text-info">
           {notice}
-        </motion.div>
+        </div>
       ) : null}
 
       {status?.replicaSet ? (
@@ -77,14 +76,14 @@ export default function ArchitecturePage() {
           <span className="panel-title">Collections</span>
           <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
             {status.collections.map((collection) => (
-              <div key={collection.name} className="rounded-xl border border-line bg-ink-900 p-4">
+              <div key={collection.name} className="rounded-sm border border-line bg-ink-900 p-4">
                 <div className="font-mono text-xs text-slate-500">{collection.name}</div>
                 <div className="mt-1 text-2xl font-bold tabular-nums text-slate-100">{formatNumber(collection.count)}</div>
               </div>
             ))}
           </div>
-          <div className="mt-4 text-xs text-slate-500">
-            MongoDB {status.version} · uptime {Math.round(status.uptimeSeconds / 60)} min · {formatNumber(status.connections.current)} open connections
+          <div className="mt-4 text-xs text-slate-400">
+            MongoDB {status.version} | Uptime {Math.round(status.uptimeSeconds / 60)} min | {formatNumber(status.connections.current)} open connections
           </div>
         </div>
       ) : null}

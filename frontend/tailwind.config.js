@@ -26,12 +26,12 @@ export default {
         3.5: '14px',
       },
       borderRadius: {
-        sm: '6px',
-        md: '8px',
-        lg: '8px',
-        xl: '8px',
-        '2xl': '8px',
-        '3xl': '8px',
+        sm: '8px',
+        md: '10px',
+        lg: '12px',
+        xl: '16px',
+        '2xl': '20px',
+        '3xl': '24px',
       },
       fontSize: {
         xxs: ['0.6875rem', { lineHeight: '1rem' }],

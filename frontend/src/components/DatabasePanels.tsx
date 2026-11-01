@@ -67,7 +67,7 @@ export function IndexUsageList({ indexes, loading, error }: { indexes: MongoStat
         {indexes.map((index) => (
           <div key={`${index.collection}.${index.name}`}>
             <div className="flex justify-between text-xs">
-              <span className="font-mono text-slate-300">
+              <span className="break-all font-mono text-slate-300">
                 {index.collection}.{index.name}
               </span>
               <span className="tabular-nums text-slate-500">{formatNumber(index.accesses)}</span>
@@ -117,23 +117,23 @@ export function HealthGauges({ metrics, mongo, loading, error }: { metrics: Metr
       <span className="panel-title">Database health</span>
       {error ? <div role="alert" className="mt-3 text-xs text-warn">Refresh failed; showing the last received health data.</div> : null}
       <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-4 xl:grid-cols-4">
-        <ProgressMeter value={pool?.inUse ?? 0} max={pool?.max ?? 0} label="Pool in use" valueLabel={pool ? `${pool.inUse} / ${pool.max}` : 'Unavailable'} tone={poolTone(poolPercent)} />
-        <ProgressMeter value={current?.cpuPercent ?? 0} max={100} label="API CPU" valueLabel={current ? `${current.cpuPercent.toFixed(0)}% / 100%` : 'Unavailable'} tone={cpuTone(current?.cpuPercent ?? 0)} />
+        <ProgressMeter value={pool?.inUse ?? 0} max={pool?.max ?? 0} label="Connection pool in use" valueLabel={pool ? `${pool.inUse} / ${pool.max}` : 'Unavailable'} tone={poolTone(poolPercent)} />
+        <ProgressMeter value={current?.cpuPercent ?? 0} max={100} label="API CPU utilization" valueLabel={current ? `${current.cpuPercent.toFixed(0)}% / 100%` : 'Unavailable'} tone={cpuTone(current?.cpuPercent ?? 0)} />
         <ProgressMeter
           value={mongo?.connections.current ?? 0}
           max={connectionLimit}
-          label="Mongo connections"
+          label="MongoDB connections"
           valueLabel={mongo ? `${mongo.connections.current} / ${connectionLimit}` : 'Unavailable'}
           tone="info"
         />
         <ProgressMeter value={cacheRate} max={100} label="Cache hit rate" valueLabel={metrics ? metrics.cache.enabled ? `${cacheRate.toFixed(0)}% / 100%` : 'Off' : 'Unavailable'} tone={metrics?.cache.enabled ? 'good' : 'neutral'} />
       </div>
       <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
-        <Fact label="Pool waiting" value={formatNumber(pool?.waiting ?? 0)} bad={(pool?.waiting ?? 0) > 0} />
-        <Fact label="Checkout failures" value={formatNumber(pool?.failed ?? 0)} bad={(pool?.failed ?? 0) > 0} />
+        <Fact label="Connection pool waiting" value={formatNumber(pool?.waiting ?? 0)} bad={(pool?.waiting ?? 0) > 0} />
+        <Fact label="Connection checkout failures" value={formatNumber(pool?.failed ?? 0)} bad={(pool?.failed ?? 0) > 0} />
         <Fact label="Slow queries" value={formatNumber(metrics?.slowQueries ?? 0)} bad={(metrics?.slowQueries ?? 0) > 100} />
-        <Fact label="API memory" value={`${(current?.memoryMB ?? 0).toFixed(0)} MB`} />
-        <Fact label="mongod resident" value={`${mongo.residentMB} MB`} />
+        <Fact label="API memory use" value={`${(current?.memoryMB ?? 0).toFixed(0)} MB`} />
+        <Fact label="MongoDB resident memory" value={`${mongo.residentMB} MB`} />
         <Fact label="Latency p99" value={formatMillis(current?.p99 ?? 0)} bad={(current?.p99 ?? 0) > 2000} />
       </dl>
     </div>

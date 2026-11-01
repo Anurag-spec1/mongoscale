@@ -1,0 +1,151 @@
+name: mongoscale
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-app-environment: &app-environment
+  HTTP_PORT: "8080"
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  MONGO_URI: mongodb://mongo:27017
+  MONGO_DATABASE: ${MONGO_DATABASE:-mongoscale}
+  REDIS_ADDR: redis:6379
+  JWT_SECRET: ${JWT_SECRET:-mongoscale-demo-jwt-secret-change-me}
+  ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@mongoscale.dev}
+  ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@12345}
+  BCRYPT_COST: ${BCRYPT_COST:-6}
+  INITIAL_MODE: ${INITIAL_MODE:-unoptimized}
+  REQUEST_TIMEOUT_MS: ${REQUEST_TIMEOUT_MS:-8000}
+  MONGO_OP_TIMEOUT_MS: ${MONGO_OP_TIMEOUT_MS:-5000}
+  SLOW_QUERY_THRESHOLD_MS: ${SLOW_QUERY_THRESHOLD_MS:-100}
+  RATE_LIMIT_RPS: ${RATE_LIMIT_RPS:-30}
+  RATE_LIMIT_BURST: ${RATE_LIMIT_BURST:-60}
+  SEED_USERS: ${SEED_USERS:-5000}
+  SEED_PRODUCTS: ${SEED_PRODUCTS:-500}
+  SEED_ORDERS: ${SEED_ORDERS:-50000}
+  SEED_REVIEWS: ${SEED_REVIEWS:-100000}
+  SEED_RESET: ${SEED_RESET:-false}
+  SEED_BCRYPT_COST: ${SEED_BCRYPT_COST:-6}
+
+services:
+  mongo:
+    image: mongo:7.0.14
+    command: ["mongod", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.5"]
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1024M
+    logging: *logging
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4.1-alpine
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru", "--save", ""]
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 320M
+    logging: *logging
+    restart: unless-stopped
+
+  seed:
+    build:
+      context: ./backend
+    entrypoint: ["/app/seed"]
+    environment:
+      <<: *app-environment
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    logging: *logging
+    restart: "no"
+
+  api:
+    build:
+      context: ./backend
+    environment:
+      <<: *app-environment
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "/app/api", "-healthcheck"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+      start_period: 15s
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "6.0"
+          memory: 1536M
+    logging: *logging
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 128M
+    logging: *logging
+    restart: unless-stopped
+
+networks:
+  backend:
+    name: mongoscale-backend
+    driver: bridge
+
+volumes:
+  mongo_data:
+    name: mongoscale-standalone-data

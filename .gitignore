@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+*.log
+backend/bin/
+backend/tmp/
+frontend/node_modules/
+frontend/dist/
+load-tests/results/*.json
+!load-tests/results/.gitkeep
+.DS_Store

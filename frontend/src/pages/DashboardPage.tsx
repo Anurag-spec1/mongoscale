@@ -42,51 +42,45 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_310px]">
+        <div className="min-w-0 space-y-5">
           <p className="text-sm text-slate-400">Server metrics refresh every second and include built-in test and k6 traffic.</p>
+
+          {metrics.data ? <StatusBanner status={status} current={current} /> : (
+            <div role={metrics.error ? 'alert' : 'status'} className="panel px-4 py-4 text-sm text-slate-300">
+              {metrics.error ? 'Live metrics are unavailable.' : 'Loading live metrics…'}
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+            <MetricCard label="Virtual users" value={current?.activeUsers ?? null} format={formatNumber} tone="info" hint={current ? `${formatNumber(current.inflight)} in flight` : 'Waiting for data'} />
+            <MetricCard label="Requests / s" value={current?.rps ?? null} format={formatNumber} tone={stressed ? 'bad' : 'good'} hint={snapshot ? `${formatCompact(snapshot.totals.requests)} total` : 'Waiting for data'} />
+            <MetricCard label="p95 latency" value={current?.p95 ?? null} format={formatMillis} tone={latencyTone(current?.p95 ?? 0)} hint={current ? `p99 ${formatMillis(current.p99)}` : 'Waiting for data'} />
+            <MetricCard label="Error rate" value={current?.errorRate ?? null} format={(value) => `${value.toFixed(1)}%`} tone={errorTone(current?.errorRate ?? 0)} hint="5xx and timeouts" />
+            <MetricCard label="Failed requests" value={snapshot?.totals.errors ?? null} format={formatNumber} tone={(snapshot?.totals.errors ?? 0) > 0 ? 'bad' : 'neutral'} hint={snapshot ? `${formatNumber(snapshot.totals.throttled)} throttled` : 'Waiting for data'} />
+            <MetricCard label="Mongo ops / s" value={current ? current.mongoReads + current.mongoWrites : null} format={formatNumber} tone="neutral" hint={current ? `${formatNumber(current.mongoReads)} reads | ${formatNumber(current.mongoWrites)} writes` : 'Waiting for data'} />
+          </div>
+
+          <RequestStream history={history} error={metrics.error} />
+
+          <div className="grid gap-4 2xl:grid-cols-2">
+            <LatencyChart data={history} error={metrics.error} />
+            <ThroughputChart data={history} error={metrics.error} />
+            <UsersErrorsChart data={history} error={metrics.error} />
+            <MongoOpsChart data={history} error={metrics.error} />
+          </div>
+
+          <div className="grid min-w-0 gap-4 2xl:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+            <QueryPlanTable plans={mongo.data?.queryPlans ?? []} loading={mongo.loading} error={mongo.error} />
+            <IndexUsageList indexes={mongo.data?.indexes ?? []} loading={mongo.loading} error={mongo.error} />
+          </div>
         </div>
-      </div>
 
-      {metrics.data ? <StatusBanner status={status} current={current} /> : (
-        <div role={metrics.error ? 'alert' : 'status'} className="panel px-4 py-4 text-sm text-slate-300">
-          {metrics.error ? 'Live metrics are unavailable.' : 'Loading live metrics…'}
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-        <MetricCard label="Virtual users" value={current?.activeUsers ?? null} format={formatNumber} tone="info" hint={current ? `${formatNumber(current.inflight)} in flight` : 'Waiting for data'} />
-        <MetricCard label="Requests / s" value={current?.rps ?? null} format={formatNumber} tone={stressed ? 'bad' : 'good'} hint={snapshot ? `${formatCompact(snapshot.totals.requests)} total` : 'Waiting for data'} />
-        <MetricCard label="p95 latency" value={current?.p95 ?? null} format={formatMillis} tone={latencyTone(current?.p95 ?? 0)} hint={current ? `p99 ${formatMillis(current.p99)}` : 'Waiting for data'} />
-        <MetricCard label="Error rate" value={current?.errorRate ?? null} format={(value) => `${value.toFixed(1)}%`} tone={errorTone(current?.errorRate ?? 0)} hint="5xx and timeouts" />
-        <MetricCard label="Failed requests" value={snapshot?.totals.errors ?? null} format={formatNumber} tone={(snapshot?.totals.errors ?? 0) > 0 ? 'bad' : 'neutral'} hint={snapshot ? `${formatNumber(snapshot.totals.throttled)} throttled` : 'Waiting for data'} />
-        <MetricCard
-          label="Mongo ops / s"
-          value={current ? current.mongoReads + current.mongoWrites : null}
-          format={formatNumber}
-          tone="neutral"
-          hint={current ? `${formatNumber(current.mongoReads)} reads | ${formatNumber(current.mongoWrites)} writes` : 'Waiting for data'}
-        />
-      </div>
-
-      <RequestStream history={history} error={metrics.error} />
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <LatencyChart data={history} error={metrics.error} />
-        <ThroughputChart data={history} error={metrics.error} />
-        <UsersErrorsChart data={history} error={metrics.error} />
-        <MongoOpsChart data={history} error={metrics.error} />
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[1fr_1fr_1fr]">
-        <LoadTestPanel status={loadTest.data} loading={loadTest.loading} statusError={loadTest.error} />
-        <ModeSwitcher catalog={catalog.data} loading={catalog.loading} loadError={catalog.error} onChanged={handleModeChanged} />
-        <HealthGauges metrics={metrics.data} mongo={mongo.data} loading={metrics.loading || mongo.loading} error={metrics.error ?? mongo.error} />
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
-        <QueryPlanTable plans={mongo.data?.queryPlans ?? []} loading={mongo.loading} error={mongo.error} />
-        <IndexUsageList indexes={mongo.data?.indexes ?? []} loading={mongo.loading} error={mongo.error} />
+        <aside className="min-w-0 space-y-4">
+          <LoadTestPanel status={loadTest.data} loading={loadTest.loading} statusError={loadTest.error} />
+          <ModeSwitcher catalog={catalog.data} loading={catalog.loading} loadError={catalog.error} onChanged={handleModeChanged} />
+          <HealthGauges metrics={metrics.data} mongo={mongo.data} loading={metrics.loading || mongo.loading} error={metrics.error ?? mongo.error} />
+        </aside>
       </div>
     </div>
   );

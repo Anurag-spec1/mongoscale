@@ -58,7 +58,7 @@ export default function DashboardPage() {
             <MetricCard label="p95 latency" value={current?.p95 ?? null} format={formatMillis} tone={latencyTone(current?.p95 ?? 0)} hint={current ? `p99 ${formatMillis(current.p99)}` : 'Waiting for data'} />
             <MetricCard label="Error rate" value={current?.errorRate ?? null} format={(value) => `${value.toFixed(1)}%`} tone={errorTone(current?.errorRate ?? 0)} hint="5xx and timeouts" />
             <MetricCard label="Failed requests" value={snapshot?.totals.errors ?? null} format={formatNumber} tone={(snapshot?.totals.errors ?? 0) > 0 ? 'bad' : 'neutral'} hint={snapshot ? `${formatNumber(snapshot.totals.throttled)} throttled` : 'Waiting for data'} />
-            <MetricCard label="Mongo ops / s" value={current ? current.mongoReads + current.mongoWrites : null} format={formatNumber} tone="neutral" hint={current ? `${formatNumber(current.mongoReads)} reads | ${formatNumber(current.mongoWrites)} writes` : 'Waiting for data'} />
+            <MetricCard label="MongoDB operations / s" value={current ? current.mongoReads + current.mongoWrites : null} format={formatNumber} tone="neutral" hint={current ? `${formatNumber(current.mongoReads)} reads | ${formatNumber(current.mongoWrites)} writes` : 'Waiting for data'} />
           </div>
 
           <RequestStream history={history} error={metrics.error} />
